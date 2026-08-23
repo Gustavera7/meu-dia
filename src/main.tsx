@@ -17,6 +17,16 @@ if (import.meta.env.PROD && 'serviceWorker' in navigator) {
     void navigator.serviceWorker
       .register(new URL('sw.js', base).href, { scope: base.href })
       .catch((err) => console.warn('Service worker nao registrado:', err))
+
+    // Quando uma versao nova assume, a pagina ainda esta rodando a antiga.
+    // Uma recarga (uma so) entrega o app atualizado sem o usuario precisar
+    // saber que existe cache.
+    let recarregando = false
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (recarregando) return
+      recarregando = true
+      window.location.reload()
+    })
   })
 }
 

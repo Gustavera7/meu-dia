@@ -49,8 +49,11 @@ self.addEventListener('fetch', (evento) => {
     return
   }
 
+  // `no-cache` obriga a revalidar no servidor. Sem isso o navegador serve
+  // uma pagina antiga do proprio cache HTTP e uma versao nova do app pode
+  // demorar horas para chegar.
   evento.respondWith(
-    fetch(req)
+    fetch(req, { cache: 'no-cache' })
       .then((res) => {
         const copia = res.clone()
         caches.open(CACHE).then((c) => c.put(req, copia))
