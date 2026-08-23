@@ -40,9 +40,10 @@ git add -A && git commit -m "descricao da mudanca" && git push
 O site atualiza em cerca de um minuto. Manter `docs/` versionado deixa codigo
 e versao publicada no mesmo commit: da para saber exatamente o que esta no ar.
 
-## Primeira configuracao do Supabase
+## Configuracao do Supabase
 
-O app usa contas do Supabase. Uma vez por projeto:
+O app tem projeto proprio, ja configurado em `src/data/supabaseConfig.ts`.
+Os passos abaixo ficam registrados para quando for preciso criar outro:
 
 1. Painel do Supabase, **SQL Editor**, cole o conteudo de
    `supabase-schema.sql` e rode. Isso cria a tabela `meudia_state` com Row
@@ -50,9 +51,13 @@ O app usa contas do Supabase. Uma vez por projeto:
 2. Para criar contas de teste sem esperar e-mail de confirmacao:
    **Authentication, Providers, Email**, desligue *Confirm email*.
 
-Para apontar para outro projeto, troque `SUPABASE_URL` e `SUPABASE_ANON_KEY`
-em `src/data/supabaseConfig.ts`. A chave anonima nasce para ficar no
+A `SUPABASE_URL` e a URL do PROJETO, sem `/rest/v1/` no final: o cliente
+monta os caminhos a partir da raiz. A chave anonima nasce para ficar no
 navegador: quem protege os dados e a Row Level Security, nao o segredo dela.
+A chave `service_role` nunca entra no codigo — ela ignora a RLS.
+
+Antes de abrir para outras pessoas, religue *Confirm email*: com ela
+desligada qualquer pessoa cria conta com e-mail inventado.
 
 ## O que existe hoje
 
