@@ -5,18 +5,17 @@
  * estes dois valores estiverem vazios, o app funciona normalmente guardando
  * tudo no aparelho: apenas login e sincronizacao ficam indisponiveis.
  *
- * Para ligar:
- *   1. Crie um projeto no Supabase.
- *   2. Rode o conteudo de `supabase-schema.sql` no SQL Editor do projeto.
- *   3. Cole abaixo a Project URL e a chave ANONIMA (anon / publishable).
+ * A URL e a do PROJETO, sem `/rest/v1/` no final: o cliente monta os
+ * caminhos sozinho a partir dela.
  *
  * A chave anonima nasce para ficar no navegador e nao da acesso a nada
  * sozinha: quem protege os dados e a Row Level Security do banco.
  * NUNCA coloque aqui a chave `service_role` — essa ignora a RLS e daria
  * acesso a tudo para qualquer pessoa que abrisse o site.
  */
-export const SUPABASE_URL = ''
-export const SUPABASE_ANON_KEY = ''
+export const SUPABASE_URL = 'https://crekkxoqlbjhreyxvqxl.supabase.co'
+export const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZWtreG9xbGJqaHJleXh2cXhsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc1MjExOTAsImV4cCI6MjEwMzA5NzE5MH0.cmsqGz3NIRvZ8E8VCjupWIzDRBGlrCXg6xfGIXWMfrc'
 
 /** Tabela deste app dentro do projeto. */
 export const TABELA = 'meudia_state'
