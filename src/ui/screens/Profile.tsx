@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { Equipment, GoalId, MotorCategory } from '@/core/types'
+import type { Equipment, GoalId, Modality, MotorCategory } from '@/core/types'
 import {
   DIET_OPTIONS, EQUIPMENT_OPTIONS, EXPERIENCE_OPTIONS, GOALS, MODULE_LABELS,
   MOTOR_OPTIONS, NUTRITION_GOAL_OPTIONS, RESTRICTION_LABELS, RESTRICTION_OPTIONS,
 } from '@/core/labels'
 import { lightHash } from '@/core/id'
+import { MODALITIES } from '@/domain/training/modalities'
 import { ALL_MODULES } from '@/data/defaults'
 import { exportJSON, importJSON } from '@/data/storage'
 import { useApp } from '@/state/useApp'
@@ -142,6 +143,14 @@ export default function Profile() {
           <Field label="Minutos por treino">
             <Stepper value={p.training.sessionMinutes} min={15} max={120} suffix="min"
               onChange={(v) => patchTraining({ sessionMinutes: v })} />
+          </Field>
+          <Field label="O que voce faz" hint="Mais de um divide a semana entre eles">
+            <div className="grid grid-cols-2 gap-2">
+              {MODALITIES.map((o) => (
+                <Chip key={o.id} label={o.label} selected={(p.training.modalities ?? []).includes(o.id)}
+                  onClick={() => patchTraining({ modalities: toggle<Modality>(p.training.modalities ?? [], o.id) })} />
+              ))}
+            </div>
           </Field>
           <Field label="Equipamentos">
             <div className="grid grid-cols-2 gap-2">

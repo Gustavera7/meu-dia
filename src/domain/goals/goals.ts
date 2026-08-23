@@ -1,6 +1,7 @@
 import type { GoalFocus, GoalKind, ISODate, TimedGoal } from '@/core/types'
 import { daysBetween, today as hoje } from '@/core/dates'
 import { makeId, stamp } from '@/core/id'
+import { templateDe, volumeDaFase } from './events'
 
 /**
  * Metas com prazo.
@@ -50,6 +51,9 @@ export function createGoal(input: {
   intensity: 0 | 1 | 2
   weeklyTrainingTarget?: number | null
   notes?: string
+  eventTemplate?: string | null
+  sport?: TimedGoal['sport']
+  target?: string
 }): TimedGoal {
   return {
     id: makeId('meta'),
@@ -62,9 +66,24 @@ export function createGoal(input: {
     weeklyTrainingTarget: input.weeklyTrainingTarget ?? null,
     notes: input.notes ?? '',
     status: 'ativa',
+    eventTemplate: input.eventTemplate ?? null,
+    sport: input.sport ?? null,
+    target: input.target ?? '',
     updatedAt: stamp(),
     deletedAt: null,
   }
+}
+
+/** Fracao do caminho ja percorrido, de 0 no inicio a 1 no dia do evento. */
+export function goalProgress(goal: TimedGoal, date: ISODate = hoje()): number {
+  const total = Math.max(1, daysBetween(goal.startDate, goal.targetDate))
+  const andado = daysBetween(goal.startDate, date)
+  return Math.min(1, Math.max(0, andado / total))
+}
+
+/** Semanas restantes ate a data, arredondadas para cima. */
+export function weeksUntil(goal: TimedGoal, date: ISODate = hoje()): number {
+  return Math.max(0, Math.ceil(daysUntil(goal, date) / 7))
 }
 
 export function daysUntil(goal: TimedGoal, date: ISODate = hoje()): number {
@@ -115,7 +134,19 @@ export function countdownLabel(goal: TimedGoal, date: ISODate = hoje()): string 
 /** Quantos treinos por semana a meta pede, dado o padrao do perfil. */
 export function weeklyTrainingFor(goal: TimedGoal, base: number): number {
   if (goal.weeklyTrainingTarget) return Math.min(6, goal.weeklyTrainingTarget)
+  const modelo = templateDe(goal.eventTemplate)
+  if (modelo && goal.focus.includes('treino')) {
+    return goalPhase(goal) === 'poupanca'
+      ? Math.max(2, modelo.diasPorSemana - 1)
+      : modelo.diasPorSemana
+  }
   if (!goal.focus.includes('treino')) return base
   if (goalPhase(goal) === 'poupanca') return Math.max(1, base - 1)
   return Math.min(6, base + goal.intensity)
+}
+
+/** Volume relativo pedido pela fase da preparacao. */
+export function goalVolumeFactor(goal: TimedGoal | null, date: ISODate = hoje()): number {
+  if (!goal?.eventTemplate) return 1
+  return volumeDaFase(goal.eventTemplate, goalProgress(goal, date))
 }

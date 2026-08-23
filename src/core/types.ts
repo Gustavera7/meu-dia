@@ -48,6 +48,22 @@ export type Equipment =
 
 export type TrainingStyle = 'musculacao' | 'funcional' | 'calistenia' | 'hibrido'
 
+/**
+ * O que a pessoa faz como treino. Nem tudo cabe em serie e repeticao:
+ * corrida se mede em tempo e distancia, natacao em series de piscina.
+ * O gerador escolhe o formato certo a partir daqui.
+ */
+export type Modality =
+  | 'musculacao'
+  | 'corrida'
+  | 'ciclismo'
+  | 'natacao'
+  | 'caminhada'
+  | 'funcional'
+  | 'calistenia'
+  | 'yoga'
+  | 'esporte'
+
 export type DietStyle = 'onivora' | 'vegetariana' | 'vegana' | 'low_carb' | 'flexivel'
 export type NutritionGoal = 'ganhar_massa' | 'perder_gordura' | 'manter' | 'mais_saude'
 
@@ -90,6 +106,12 @@ export interface Profile {
     sessionMinutes: number
     equipment: Equipment[]
     style: TrainingStyle
+    /**
+     * O que entra na semana. Mais de uma modalidade divide os dias entre
+     * elas, que e como a maioria treina de verdade: pesos e corrida na
+     * mesma semana, nao um ou outro.
+     */
+    modalities: Modality[]
   }
   nutrition: {
     dietStyle: DietStyle
@@ -145,6 +167,17 @@ export interface Exercise {
   note?: string
 }
 
+/**
+ * Um bloco do treino.
+ *
+ * O mesmo formato serve para forca e para resistencia, so muda a leitura:
+ * numa serie, `sets` sao series e `reps` sao repeticoes; num intervalado
+ * `sets` sao tiros e `reps` e a distancia ou o tempo de cada um; num
+ * continuo, `sets` e 1 e `reps` e a duracao. Manter um formato so evita
+ * espalhar condicionais por toda a interface.
+ */
+export type BlockKind = 'serie' | 'continuo' | 'intervalo' | 'aquecimento' | 'volta_calma'
+
 export interface PlannedSet {
   exerciseId: ID
   name: string
@@ -152,6 +185,9 @@ export interface PlannedSet {
   reps: string
   restSeconds: number
   note?: string
+  kind?: BlockKind
+  /** Como deve doer: usado no lugar de carga quando nao ha peso. */
+  effort?: string
 }
 
 export interface Workout {
@@ -160,6 +196,7 @@ export interface Workout {
   focus: string
   estimatedMinutes: number
   blocks: PlannedSet[]
+  modality?: Modality
 }
 
 export interface WeeklyTrainingPlan {
@@ -393,6 +430,16 @@ export interface TimedGoal extends Synced {
   weeklyTrainingTarget: number | null
   notes: string
   status: 'ativa' | 'concluida' | 'abandonada'
+  /**
+   * Preparacao para um evento com receita conhecida: maratona, prova de
+   * forca, trilha longa. Guarda so o id do modelo; a receita em si vive em
+   * `domain/goals/events.ts` e pode evoluir sem migrar dados de ninguem.
+   */
+  eventTemplate?: string | null
+  /** Esporte da preparacao, quando ela tem um. */
+  sport?: Modality | null
+  /** Distancia ou marca alvo, em texto livre: "42 km", "100 kg". */
+  target?: string
 }
 
 /* ---------------------------------------------------------------- */

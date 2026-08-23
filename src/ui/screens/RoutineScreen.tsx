@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import type { RoutineKind, RoutineStep } from '@/core/types'
-import { newRoutineStep, routineMinutes } from '@/domain/routines/defaults'
+import {
+  buildEveningRoutine, buildMorningRoutine, newRoutineStep, routineTimeLabel,
+} from '@/domain/routines/defaults'
 import { useToday } from '@/state/useApp'
 import { Screen } from '@/ui/components/Layout'
 import {
@@ -25,6 +27,11 @@ export default function RoutineScreen() {
   const routineKind: RoutineKind = kind === 'noite' ? 'noite' : 'manha'
   const routine = state.routines[routineKind]
   const log = state.logs[today]
+
+  const orcamento =
+    routineKind === 'manha'
+      ? state.profile.routine.morningMinutes
+      : state.profile.routine.eveningMinutes
 
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState('')
@@ -54,8 +61,39 @@ export default function RoutineScreen() {
   const info = TITLES[routineKind]
 
   return (
-    <Screen title={info.title} back subtitle={`${routineMinutes(routine)} minutos no total`}>
+    <Screen title={info.title} back subtitle={routineTimeLabel(routine)}>
       <Note>{info.note}</Note>
+
+      {/* O tempo disponivel decide quantos passos cabem. Deixar isso
+          escondido no Perfil tornava a relacao invisivel: aqui a pessoa
+          ve o orcamento e o resultado lado a lado. */}
+      <Card className="mt-4">
+        <p className="mb-2 text-[13px] font-medium text-muted">
+          Tempo que voce tem {routineKind === 'manha' ? 'de manha' : 'a noite'}
+        </p>
+        <Stepper
+          value={orcamento}
+          min={10}
+          max={120}
+          suffix="min"
+          onChange={(v) =>
+            dispatch({
+              type: 'update_profile',
+              patch: {
+                routine: {
+                  ...state.profile.routine,
+                  [routineKind === 'manha' ? 'morningMinutes' : 'eveningMinutes']: v,
+                },
+              },
+            })
+          }
+        />
+        <p className="mt-2 text-[11px] leading-snug text-faint">
+          Os minutos de cada passo sao reserva, nao meta. Sobrar tempo e o
+          resultado esperado.
+        </p>
+      </Card>
+
       <div className="h-4" />
 
       <Section title="Hoje">
@@ -65,7 +103,7 @@ export default function RoutineScreen() {
               key={s.id}
               label={s.name}
               sub={s.note}
-              meta={`${s.minutes} min`}
+              meta={`~${s.minutes} min`}
               done={!!log?.done[`${routineKind}:${s.id}`]}
               onToggle={() => dispatch({ type: 'toggle_task', date: today, key: `${routineKind}:${s.id}` })}
             />
@@ -119,9 +157,27 @@ export default function RoutineScreen() {
         </div>
       </Section>
 
-      <Button variant="subtle" full onClick={() => setEditing(true)}>
-        Adicionar passo
-      </Button>
+      <div className="space-y-2">
+        <Button variant="subtle" full onClick={() => setEditing(true)}>
+          Adicionar passo
+        </Button>
+        <Button
+          variant="ghost"
+          full
+          className="text-xs"
+          onClick={() => {
+            if (!confirm('Voltar para a sugestao do app? Os passos que voce criou serao perdidos.')) return
+            update(
+              (routineKind === 'manha'
+                ? buildMorningRoutine(orcamento)
+                : buildEveningRoutine(orcamento)
+              ).steps,
+            )
+          }}
+        >
+          Restaurar sugestao do app
+        </Button>
+      </div>
 
       <Sheet open={editing} onClose={() => setEditing(false)} title="Novo passo">
         <Field label="O que voce vai fazer">

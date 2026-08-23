@@ -3,7 +3,7 @@ import { addDays, today as todayISO } from '@/core/dates'
 import { stamp } from '@/core/id'
 import { buildDayPlan } from '@/domain/planning/dayPlan'
 import { generateWeeklyPlan } from '@/domain/training/generator'
-import { primaryGoal, weeklyTrainingFor } from '@/domain/goals/goals'
+import { goalVolumeFactor, primaryGoal, weeklyTrainingFor } from '@/domain/goals/goals'
 import { mealsFromPrescription, trainingPlanFromPrescription } from '@/domain/prescriptions/prescriptions'
 import { emptyState } from '@/data/defaults'
 import type { Action, LogPatch } from './actions'
@@ -124,7 +124,10 @@ export function reducer(state: AppState, action: Action): AppState {
       const frequencia = meta
         ? weeklyTrainingFor(meta, state.profile.training.daysPerWeek)
         : undefined
-      const plan = generateWeeklyPlan(state.profile, undefined, frequencia)
+      // A fase da preparacao decide o volume: base sobe devagar, pico
+      // exige mais, e a reta final corta de proposito.
+      const volume = goalVolumeFactor(meta, todayISO())
+      const plan = generateWeeklyPlan(state.profile, undefined, frequencia, volume)
       // planos futuros ficam obsoletos quando a rotina de treino muda
       const cutoff = todayISO()
       const plans = Object.fromEntries(
@@ -246,8 +249,46 @@ export function reducer(state: AppState, action: Action): AppState {
     case 'remove_book':
       return { ...state, books: tombstone(state.books, action.id), sync: dirty(state) }
 
-    case 'add_goal':
-      return { ...state, goals: [...state.goals, action.goal], sync: dirty(state) }
+    case 'add_goal': {
+      let next: AppState = {
+        ...state,
+        goals: [...state.goals, action.goal],
+        sync: dirty(state),
+      }
+
+      // Preparar uma maratona sem corrida na semana nao faria sentido: o
+      // esporte da meta entra no perfil se ainda nao estiver la.
+      const esporte = action.goal.sport
+      if (esporte && !(next.profile.training.modalities ?? []).includes(esporte)) {
+        next = {
+          ...next,
+          profile: {
+            ...next.profile,
+            training: {
+              ...next.profile.training,
+              modalities: [esporte, ...(next.profile.training.modalities ?? [])],
+            },
+          },
+          profileUpdatedAt: stamp(),
+        }
+      }
+
+      // Rotina prescrita por profissional nunca e substituida pelo app.
+      const prescrito = next.trainingPlan?.source === 'prescrito'
+      if (!prescrito && action.goal.focus.includes('treino')) {
+        next = {
+          ...next,
+          trainingPlan: generateWeeklyPlan(
+            next.profile,
+            undefined,
+            weeklyTrainingFor(action.goal, next.profile.training.daysPerWeek),
+            goalVolumeFactor(action.goal, todayISO()),
+          ),
+          trainingPlanUpdatedAt: stamp(),
+        }
+      }
+      return next
+    }
 
     case 'update_goal':
       return {

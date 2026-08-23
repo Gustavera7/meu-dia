@@ -4,6 +4,7 @@ import { PILLARS } from '@/domain/pillars/pillars'
 import { explainPlan, workoutForPlan } from '@/domain/planning/dayPlan'
 import { dayProgress, dayTasks, pillarConsistency, streak } from '@/domain/planning/progress'
 import { mealSummary } from '@/domain/nutrition/meals'
+import { routineTimeLabel } from '@/domain/routines/defaults'
 import { useApp, useToday } from '@/state/useApp'
 import { openGoals } from '@/state/selectors'
 import { countdownLabel, goalPhase, PHASE_LABELS } from '@/domain/goals/goals'
@@ -64,16 +65,41 @@ export default function Dashboard() {
 
   const hour = new Date().getHours()
   const eveningTime = hour >= 18
-  // "manter_ritmo" nao vira aviso: silencio no topo significa plano sem mudanca.
-  const realAdjustments = explainPlan(state, today).filter((a) => a.code !== 'manter_ritmo')
+  /**
+   * O que aparece no topo do dia.
+   *
+   * Silencio significa plano sem mudanca, entao "manter_ritmo" nao vira
+   * aviso. A contagem regressiva tambem sai: o card da meta logo acima ja
+   * diz isso, e repetir a mesma informacao duas vezes deixa a abertura do
+   * app cansativa. No maximo tres recados, para a tela continuar leve.
+   */
+  const ignorados = new Set(['manter_ritmo', meta ? 'meta_contagem' : ''])
+  const realAdjustments = explainPlan(state, today)
+    .filter((a) => !ignorados.has(a.code))
+    .slice(0, 3)
 
   return (
     <Screen>
-      <header className="mb-5">
-        <p className="text-[13px] text-faint">{longDate(today)}</p>
-        <h1 className="mt-0.5 text-[26px] font-semibold tracking-tight">
-          {greeting()}, {state.profile.name}
-        </h1>
+      <header className="mb-5 flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-[13px] text-faint">{longDate(today)}</p>
+          <h1 className="mt-0.5 truncate text-[26px] font-semibold tracking-tight">
+            {greeting()}, {state.profile.name}
+          </h1>
+        </div>
+        {/* Perfil saiu da barra de abas para dar lugar a Evolucao, e passou
+            a morar aqui: ajuste e coisa de vez em quando, nao de todo dia. */}
+        <button
+          type="button"
+          onClick={() => navigate('/perfil')}
+          aria-label="Perfil e ajustes"
+          className="mt-1 grid size-10 shrink-0 place-items-center rounded-xl bg-surface-2 text-muted"
+        >
+          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="12" cy="12" r="3" />
+            <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.1a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-3-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.1-3l-.1-.1A2 2 0 1 1 7 4.1l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1Z" />
+          </svg>
+        </button>
       </header>
 
       {/* Resumo do dia */}
@@ -132,7 +158,7 @@ export default function Dashboard() {
           <Card>
             <CardHead
               title="Rotina da manha"
-              meta={`${state.routines.manha.steps.reduce((s, x) => s + x.minutes, 0)} min`}
+              meta={routineTimeLabel(state.routines.manha)}
               ratio={ratioOf('manha:')}
               onOpen={() => navigate('/rotina/manha')}
             />
@@ -141,7 +167,7 @@ export default function Dashboard() {
                 key={s.id}
                 label={s.name}
                 sub={s.note}
-                meta={`${s.minutes} min`}
+                meta={`~${s.minutes} min`}
                 done={!!log?.done[`manha:${s.id}`]}
                 onToggle={() => toggle(`manha:${s.id}`)}
               />
@@ -210,7 +236,7 @@ export default function Dashboard() {
           <Card>
             <CardHead
               title="Motor"
-              meta={`${plan.motorSession.totalMinutes} min`}
+              meta={`reserve ~${plan.motorSession.totalMinutes} min`}
               onOpen={() => navigate('/motor')}
             />
             <div className="mb-2 flex flex-wrap gap-1.5">
@@ -288,7 +314,7 @@ export default function Dashboard() {
           <Card accent={eveningTime}>
             <CardHead
               title="Rotina da noite"
-              meta={`${state.routines.noite.steps.reduce((s, x) => s + x.minutes, 0)} min`}
+              meta={routineTimeLabel(state.routines.noite)}
               ratio={ratioOf('noite:')}
               onOpen={() => navigate('/rotina/noite')}
             />
@@ -297,7 +323,7 @@ export default function Dashboard() {
                 key={s.id}
                 label={s.name}
                 sub={s.note}
-                meta={`${s.minutes} min`}
+                meta={`~${s.minutes} min`}
                 done={!!log?.done[`noite:${s.id}`]}
                 onToggle={() => toggle(`noite:${s.id}`)}
               />
@@ -326,15 +352,6 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Sincronizacao */}
-        <button
-          type="button"
-          onClick={() => navigate('/perfil')}
-          className="w-full text-left text-[11px] text-faint"
-        >
-          {sync.destino} - {sync.message}
-        </button>
-
         {/* Pilares */}
         <Card onClick={() => navigate('/pilares')}>
           <CardHead title="Pilares" meta="ultimos 7 dias" />
@@ -354,6 +371,10 @@ export default function Dashboard() {
           </p>
         </Card>
       </div>
+
+      <p className="pt-4 text-center text-[11px] text-faint">
+        {sync.destino} - {sync.message}
+      </p>
     </Screen>
   )
 }

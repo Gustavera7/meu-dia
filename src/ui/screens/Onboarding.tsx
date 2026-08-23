@@ -1,10 +1,11 @@
 import { useMemo, useState } from 'react'
-import type { Equipment, GoalId, MotorCategory, Profile } from '@/core/types'
+import type { Equipment, GoalId, Modality, MotorCategory, Profile } from '@/core/types'
 import {
   DIET_OPTIONS, EQUIPMENT_OPTIONS, EXPERIENCE_OPTIONS, GOALS, INTEREST_OPTIONS,
   MOTOR_OPTIONS, NUTRITION_GOAL_OPTIONS, READING_FREQ_OPTIONS, RESTRICTION_LABELS,
-  RESTRICTION_OPTIONS, SEX_OPTIONS, STYLE_OPTIONS,
+  RESTRICTION_OPTIONS, SEX_OPTIONS,
 } from '@/core/labels'
+import { MODALITIES } from '@/domain/training/modalities'
 import { defaultProfile } from '@/data/defaults'
 import { HABIT_SEEDS, habitFromSeed } from '@/domain/habits/defaults'
 import { buildInitialMeals } from '@/domain/nutrition/meals'
@@ -130,7 +131,7 @@ export default function Onboarding() {
       {
         title: 'Seu treino',
         hint: 'Isso define a rotina semanal que vou montar.',
-        valid: p.training.equipment.length > 0,
+        valid: p.training.equipment.length > 0 && (p.training.modalities ?? []).length > 0,
         body: (
           <>
             <Field label="Experiencia">
@@ -157,11 +158,12 @@ export default function Onboarding() {
                 ))}
               </div>
             </Field>
-            <Field label="Preferencia de treino">
+            <Field label="O que voce faz" hint="Pode marcar mais de um. A semana se divide entre eles.">
               <div className="grid grid-cols-2 gap-2">
-                {STYLE_OPTIONS.map((o) => (
-                  <Chip key={o.id} label={o.label} hint={o.hint} selected={p.training.style === o.id}
-                    onClick={() => setTraining({ style: o.id })} />
+                {MODALITIES.map((o) => (
+                  <Chip key={o.id} label={o.label} hint={o.hint}
+                    selected={(p.training.modalities ?? []).includes(o.id)}
+                    onClick={() => setTraining({ modalities: toggle<Modality>(p.training.modalities ?? [], o.id) })} />
                 ))}
               </div>
             </Field>

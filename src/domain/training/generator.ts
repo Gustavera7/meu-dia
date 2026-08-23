@@ -1,8 +1,10 @@
 import type {
-  Equipment, Exercise, GoalId, MovementPattern, PlannedSet,
+  Equipment, Exercise, GoalId, Modality, MovementPattern, PlannedSet,
   Profile, Workout, WeeklyTrainingPlan,
 } from '@/core/types'
 import { EXERCISES } from './exercises'
+import { enduranceSession, enduranceWeek } from './endurance'
+import { isEndurance, modalityLabel } from './modalities'
 import { makeId, seededRandom } from '@/core/id'
 
 /* ---------------- prescricao por objetivo ---------------- */
@@ -213,27 +215,75 @@ const EMPHASIS_LABEL: Record<Emphasis, string> = {
   saude: 'Foco em consistencia: estimulo suficiente sem desgaste.',
 }
 
+/**
+ * Reparte os dias da semana entre as modalidades escolhidas.
+ * A primeira da lista fica com a sobra: e a que a pessoa colocou primeiro,
+ * entao e a que ela mais quer fazer.
+ */
+function repartirDias(dias: number, mods: Modality[]): { mod: Modality; dias: number }[] {
+  const base = Math.floor(dias / mods.length)
+  let sobra = dias % mods.length
+  return mods.map((mod) => {
+    const extra = sobra > 0 ? 1 : 0
+    sobra -= extra
+    return { mod, dias: base + extra }
+  })
+}
+
+/** Intercala as listas para nao cair dois treinos da mesma modalidade seguidos. */
+function intercalar(grupos: Workout[][]): Workout[] {
+  const out: Workout[] = []
+  const maior = Math.max(0, ...grupos.map((g) => g.length))
+  for (let i = 0; i < maior; i++) {
+    for (const grupo of grupos) if (grupo[i]) out.push(grupo[i])
+  }
+  return out
+}
+
+function treinosDeForca(profile: Profile, dias: number, rand: () => number): Workout[] {
+  const templates = SPLITS[Math.min(6, Math.max(1, dias))] ?? SPLITS[3]
+  return templates.map((t) => buildWorkout(t, profile, rand))
+}
+
 export function generateWeeklyPlan(
   profile: Profile,
   seed = makeId('seed'),
   /** frequencia pedida por uma meta com prazo; sem ela vale a do perfil */
   daysPerWeekOverride?: number,
+  /** volume relativo, usado pela preparacao para evento */
+  volumeFactor = 1,
 ): WeeklyTrainingPlan {
   const days = Math.min(6, Math.max(1, daysPerWeekOverride ?? profile.training.daysPerWeek))
   const rand = seededRandom(seed)
-  const templates = SPLITS[days] ?? SPLITS[3]
-  const workouts = templates.map((t) => buildWorkout(t, profile, rand))
+  const mods: Modality[] =
+    profile.training.modalities?.length ? profile.training.modalities : ['musculacao']
 
+  const grupos = repartirDias(days, mods)
+    .filter((r) => r.dias > 0)
+    .map(({ mod, dias }) =>
+      isEndurance(mod)
+        ? enduranceWeek(dias).map((k) =>
+            enduranceSession(k, mod, profile.training.experience, volumeFactor),
+          )
+        : treinosDeForca(profile, dias, rand).map((w) => ({ ...w, modality: mod })),
+    )
+
+  const workouts = intercalar(grupos)
   const weekMap: (string | null)[] = Array(7).fill(null)
   const slots = WEEK_SLOTS[days] ?? WEEK_SLOTS[3]
   slots.forEach((dayIndex, i) => {
-    weekMap[dayIndex] = workouts[i % workouts.length].id
+    if (workouts[i]) weekMap[dayIndex] = workouts[i].id
   })
+
+  const resumo =
+    mods.length > 1
+      ? `Semana combinada: ${mods.map((m) => modalityLabel(m).toLowerCase()).join(' e ')}.`
+      : EMPHASIS_LABEL[emphasisFor(profile.goals)]
 
   return {
     id: makeId('plan'),
     createdAt: new Date().toISOString(),
-    goalSummary: EMPHASIS_LABEL[emphasisFor(profile.goals)],
+    goalSummary: resumo,
     source: 'gerado',
     sourcePlanId: null,
     weekMap,
@@ -242,18 +292,27 @@ export function generateWeeklyPlan(
 }
 
 /**
- * Versao mais leve do mesmo treino, usada quando o check-in mostra
- * energia ou sono baixos. Nao troca os exercicios: reduz o volume.
+ * Versao mais leve do mesmo treino, para quando o check-in mostra energia
+ * ou sono baixos. Nao troca exercicio: em forca corta series, em resistencia
+ * corta tempo. O treino continua sendo o mesmo, so cabe no dia que voce tem.
  */
 export function lighterVersion(workout: Workout): Workout {
+  const duracao = (b: PlannedSet) => b.kind === 'continuo' || b.kind === 'intervalo'
+  const encurtar = (texto: string): string =>
+    texto.replace(/(\d+)\s*min/, (_, n) => `${Math.max(10, Math.round(Number(n) * 0.65))} min`)
+
   return {
     ...workout,
-    id: workout.id,
     name: `${workout.name} (leve)`,
     estimatedMinutes: Math.round(workout.estimatedMinutes * 0.7),
     blocks: workout.blocks
+      .filter((b) => b.kind !== 'volta_calma' || workout.blocks.length <= 3)
       .slice(0, Math.max(3, workout.blocks.length - 2))
-      .map((b) => ({ ...b, sets: Math.max(2, b.sets - 1) })),
+      .map((b) =>
+        duracao(b)
+          ? { ...b, sets: b.kind === 'intervalo' ? Math.max(3, b.sets - 2) : b.sets, reps: encurtar(b.reps) }
+          : { ...b, sets: Math.max(2, b.sets - 1) },
+      ),
   }
 }
 

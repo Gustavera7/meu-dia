@@ -1,6 +1,7 @@
 import type { AppState, ISODate } from '@/core/types'
 import { addDays, lastNDays } from '@/core/dates'
-import { countdownLabel, goalPhase, primaryGoal, weeklyTrainingFor } from '@/domain/goals/goals'
+import { countdownLabel, goalPhase, goalProgress, primaryGoal, weeklyTrainingFor } from '@/domain/goals/goals'
+import { faseAtual } from '@/domain/goals/events'
 
 /**
  * Motor de adaptacao.
@@ -21,6 +22,7 @@ export type AdjustmentCode =
   | 'dormir_cedo'
   | 'respiracao_extra'
   | 'meta_contagem'
+  | 'meta_fase'
   | 'meta_poupanca'
   | 'meta_nutricao'
   | 'manter_ritmo'
@@ -118,8 +120,8 @@ export function computeAdjustments(state: AppState, targetDate: ISODate): Adjust
   /* ---- metas com prazo mandam antes de qualquer outra regra ---- */
   const meta = primaryGoal(state.goals ?? [], targetDate)
   if (meta) {
-    const fase = goalPhase(meta, targetDate)
-    if (fase === 'poupanca') {
+    const etapa = goalPhase(meta, targetDate)
+    if (etapa === 'poupanca') {
       out.push({
         code: 'meta_poupanca',
         message: `${meta.name} esta chegando. Treino leve ate la.`,
@@ -140,7 +142,23 @@ export function computeAdjustments(state: AppState, targetDate: ISODate): Adjust
       })
     }
 
-    if (meta.focus.includes('nutricao') && meta.intensity === 2) {
+    // Preparacao com receita conhecida fala por fase: o que muda no treino
+    // e o que muda na mesa sao coisas diferentes em cada momento do ciclo.
+    const fase = faseAtual(meta.eventTemplate, goalProgress(meta, targetDate))
+    if (fase && etapa !== 'poupanca') {
+      out.push({
+        code: 'meta_fase',
+        message: `${fase.nome}: ${fase.treino}`,
+        reason: `${meta.name} em ${countdownLabel(meta, targetDate)}.`,
+      })
+    }
+    if (fase && meta.focus.includes('nutricao')) {
+      out.push({
+        code: 'meta_nutricao',
+        message: fase.nutricao,
+        reason: 'Orientacao geral da fase. Um plano de nutricionista, se houver, vem antes disto.',
+      })
+    } else if (!fase && meta.focus.includes('nutricao') && meta.intensity === 2) {
       out.push({
         code: 'meta_nutricao',
         message: 'Alimentacao no plano hoje, sem improviso.',

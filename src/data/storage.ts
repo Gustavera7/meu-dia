@@ -1,4 +1,4 @@
-import type { AppState, Synced } from '@/core/types'
+import type { AppState, Modality, Synced } from '@/core/types'
 import { STATE_VERSION, emptyState } from './defaults'
 import { localAdapter } from './adapters/local'
 import { migrarLegado, storageKey } from './scope'
@@ -42,7 +42,31 @@ function v1ParaV2(state: AppState): AppState {
   }
 }
 
-const MIGRATIONS: Record<number, Migration> = { 1: v1ParaV2 }
+/**
+ * Perfis criados antes das modalidades nao tem o campo, e a tela quebraria
+ * ao chamar `.includes` nele. Estado antigo NUNCA e apenas o novo com menos
+ * chaves: os objetos aninhados vem inteiros do disco e precisam ser
+ * completados um a um.
+ */
+function v2ParaV3(state: AppState): AppState {
+  const training = state.profile?.training
+  return {
+    ...state,
+    version: 3,
+    profile: {
+      ...state.profile,
+      training: {
+        ...training,
+        modalities:
+          training?.modalities?.length > 0
+            ? training.modalities
+            : ([training?.style === 'calistenia' ? 'calistenia' : 'musculacao'] as Modality[]),
+      },
+    },
+  }
+}
+
+const MIGRATIONS: Record<number, Migration> = { 1: v1ParaV2, 2: v2ParaV3 }
 
 function migrate(raw: AppState): AppState {
   let state = raw

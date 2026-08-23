@@ -10,7 +10,8 @@ const ICONS: Record<string, ReactNode> = {
   nutricao: <path d="M12 21c-4 0-7-3.2-7-7.5S8 4 12 4s7 5.2 7 9.5S16 21 12 21ZM12 4V2" />,
   motor: <path d="M12 5.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM8 22l2.5-6.5L8 12l1-4 3 2 3 1M9 8 6 9M12 15.5 16 22" />,
   perfil: <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />,
-  mais: <path d="M4 7h16M4 12h16M4 17h10" />,
+  evolucao: <path d="M4 19h16M6 16V9M11 16V5M16 16v-4M21 16v-7" />,
+  ajustes: <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.1a2 2 0 1 1-4 0v-.2a1.7 1.7 0 0 0-3-1.1l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.1-3l-.1-.1A2 2 0 1 1 7 4.1l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.5 1Z" />,
 }
 
 function Icon({ name, active }: { name: string; active: boolean }) {
@@ -36,7 +37,7 @@ const TABS = [
   { to: '/treino', icon: 'treino', label: 'Treino' },
   { to: '/nutricao', icon: 'nutricao', label: 'Comida' },
   { to: '/motor', icon: 'motor', label: 'Motor' },
-  { to: '/mais', icon: 'mais', label: 'Mais' },
+  { to: '/evolucao', icon: 'evolucao', label: 'Evolucao' },
 ]
 
 export function TabBar() {

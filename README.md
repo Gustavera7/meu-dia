@@ -84,8 +84,8 @@ desligada qualquer pessoa cria conta com e-mail inventado.
 | Seu amanha | Plano do proximo dia com o motivo de cada ajuste |
 | Pilares | Consistencia por area, sem linguagem clinica |
 | Perfil | Edicao total, ligar/desligar areas, backup e sincronizacao |
-| Metas | Objetivos com data marcada que apertam a rotina ate passarem |
-| Relatorio | Pontos fortes e pontos a melhorar, a qualquer momento |
+| Evolucao | Sugestoes do que fazer a seguir, aderencia, tendencias e pilares |
+| Metas | Preparacao para eventos com data, que muda treino e alimentacao |
 | Planos prescritos | Cadastrar o que nutricionista ou personal passou |
 
 ## Arquitetura
@@ -126,6 +126,49 @@ Regras que valem para evoluir sem quebrar:
   substituir esse arquivo mantendo o mesmo contrato.
 - Catalogos (`exercises.ts`, `foods.ts`, `drills.ts`, `recipes.ts`) sao dados.
   Crescem sem tocar em logica.
+
+## Tempo com folga, de proposito
+
+Numero apertado transforma rotina em corrida contra o relogio, e a primeira
+coisa que se abandona e justamente o que deveria acalmar. No app o minuto e
+RESERVA, nao meta: a tela diz "reserve ~25 min" em vez de "25 min", e sobrar
+tempo e o resultado esperado.
+
+Cada rotina tem um NUCLEO, que entra sempre porque e o que sustenta os dias
+ruins, e passos opcionais que so entram se couberem com conforto no tempo
+informado. Esse tempo e editavel na propria tela da rotina, ao lado do
+resultado, e nao escondido nas configuracoes: a relacao entre quanto tempo
+voce tem e quantos passos cabem precisa ser visivel.
+
+## Modalidades
+
+A semana nao e so serie e repeticao. O gerador entende musculacao, corrida,
+ciclismo, natacao, caminhada, funcional, calistenia, yoga e esporte, e mais de
+uma modalidade divide os dias entre elas, intercalando para nao cair duas do
+mesmo tipo seguidas.
+
+Em resistencia o que organiza a semana nao e grupo muscular, e INTENSIDADE: a
+maior parte precisa ser leve o bastante para conversar durante, e so uma ou
+duas sessoes sao fortes. Inverter isso e o erro mais comum de quem comeca a
+correr, e a razao de o app nunca gerar duas sessoes puxadas seguidas.
+
+## Preparacao para eventos
+
+Escolher o evento e a data ja basta. Maratona, meia, 10 km, trilha, prova
+longa de bike, prova de forca, competicao, data marcada, ou personalizada.
+
+Cada modelo traz fases, e a fase muda o que o app pede: o volume sobe devagar,
+tem um pico bem antes da data e CAI de proposito na reta final. Chegar cansado
+no dia desfaz meses de trabalho, e e o erro mais comum de quem se prepara
+sozinho.
+
+A alimentacao muda junto, por fase. Sao orientacoes gerais para organizar a
+rotina, nao prescricao: quando existe um plano de nutricionista cadastrado,
+ele vale no lugar delas.
+
+Criar a preparacao ajusta o perfil sozinho. Marcar uma maratona coloca corrida
+na semana se ela ainda nao estava la, e regera a rotina de treino na frequencia
+e no volume da fase atual, a menos que exista plano prescrito ativo.
 
 ## O motor de adaptacao
 

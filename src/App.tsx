@@ -18,13 +18,12 @@ import CheckIn from '@/ui/screens/CheckIn'
 import Tomorrow from '@/ui/screens/Tomorrow'
 import Pillars from '@/ui/screens/Pillars'
 import Profile from '@/ui/screens/Profile'
-import More from '@/ui/screens/More'
 import Goals from '@/ui/screens/Goals'
-import Report from '@/ui/screens/Report'
+import Evolucao from '@/ui/screens/Evolucao'
 import Prescriptions from '@/ui/screens/Prescriptions'
 
 /** Rotas que mostram a barra inferior. */
-const ROOT_ROUTES = ['/', '/treino', '/nutricao', '/motor', '/mais']
+const ROOT_ROUTES = ['/', '/treino', '/nutricao', '/motor', '/evolucao']
 
 const SEM_CONTA = 'sistema-pessoal:sem-conta'
 
@@ -75,9 +74,11 @@ export default function App() {
         <Route path="/amanha" element={<Tomorrow />} />
         <Route path="/pilares" element={<Pillars />} />
         <Route path="/perfil" element={<Profile />} />
-        <Route path="/mais" element={<More />} />
+        <Route path="/evolucao" element={<Evolucao />} />
         <Route path="/metas" element={<Goals />} />
-        <Route path="/relatorio" element={<Report />} />
+        {/* rotas antigas seguem valendo para nao quebrar atalho salvo */}
+        <Route path="/relatorio" element={<Navigate to="/evolucao" replace />} />
+        <Route path="/mais" element={<Navigate to="/evolucao" replace />} />
         <Route path="/planos/:kind" element={<Prescriptions />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

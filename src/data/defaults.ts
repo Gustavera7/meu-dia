@@ -19,6 +19,7 @@ export function defaultProfile(): Profile {
       sessionMinutes: 45,
       equipment: ['peso_corpo'],
       style: 'musculacao',
+      modalities: ['musculacao'],
     },
     nutrition: {
       dietStyle: 'onivora',
@@ -31,8 +32,8 @@ export function defaultProfile(): Profile {
     routine: {
       wakeTime: '06:30',
       sleepTime: '23:00',
-      morningMinutes: 15,
-      eveningMinutes: 30,
+      morningMinutes: 30,
+      eveningMinutes: 50,
     },
     motor: { focus: ['mobilidade', 'equilibrio', 'coordenacao'], sessionMinutes: 8 },
     personal: { readingFrequency: 'as_vezes', readingMinutes: 15, interests: [] },
@@ -40,7 +41,7 @@ export function defaultProfile(): Profile {
   }
 }
 
-export const STATE_VERSION = 2
+export const STATE_VERSION = 3
 
 export function emptyState(): AppState {
   const profile = defaultProfile()

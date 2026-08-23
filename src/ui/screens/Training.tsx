@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import type { Scale5, Workout } from '@/core/types'
+import type { PlannedSet, Scale5, Workout } from '@/core/types'
 import { weekdayIndex } from '@/core/dates'
 import { SCALE_LABELS } from '@/core/labels'
 import { workoutForPlan } from '@/domain/planning/dayPlan'
 import { useNavigate } from 'react-router-dom'
 import { useToday } from '@/state/useApp'
 import { activePrescription } from '@/state/selectors'
+import { modalityLabel } from '@/domain/training/modalities'
 import { Screen } from '@/ui/components/Layout'
 import {
   Button, Card, EmptyState, Field, Note, Scale, Section, Sheet,
@@ -14,22 +15,38 @@ import {
 
 const DAYS = ['D', 'S', 'T', 'Q', 'Q', 'S', 'S']
 
+/**
+ * Um bloco de treino em uma linha.
+ * "1 x 40 min" nao e como ninguem descreve uma corrida, entao bloco unico
+ * mostra so a duracao. Sem carga, o que orienta e o esforco, nao o descanso.
+ */
+function BlocoLinha({ b }: { b: PlannedSet }) {
+  const unico = b.sets <= 1
+  const medida = unico ? b.reps : `${b.sets} x ${b.reps}`
+  const detalhes = [
+    !unico && b.restSeconds > 0 ? `descanso ${b.restSeconds}s` : null,
+    b.effort,
+    b.note,
+  ].filter(Boolean)
+
+  return (
+    <div className="py-3 first:pt-0 last:pb-0">
+      <div className="flex items-baseline justify-between gap-3">
+        <p className="text-[15px] font-medium">{b.name}</p>
+        <span className="shrink-0 text-[13px] tabular-nums text-accent">{medida}</span>
+      </div>
+      {detalhes.length > 0 && (
+        <p className="mt-1 text-[11px] leading-snug text-faint">{detalhes.join(' - ')}</p>
+      )}
+    </div>
+  )
+}
+
 function ExerciseList({ workout }: { workout: Workout }) {
   return (
     <div className="divide-y divide-line/60">
       {workout.blocks.map((b, i) => (
-        <div key={`${b.exerciseId}-${i}`} className="py-3 first:pt-0 last:pb-0">
-          <div className="flex items-baseline justify-between gap-3">
-            <p className="text-[15px] font-medium">{b.name}</p>
-            <span className="shrink-0 text-[13px] tabular-nums text-accent">
-              {b.sets} x {b.reps}
-            </span>
-          </div>
-          <div className="mt-1 flex flex-wrap items-center gap-2">
-            <span className="text-[11px] text-faint">descanso {b.restSeconds}s</span>
-            {b.note && <span className="text-[11px] text-faint">- {b.note}</span>}
-          </div>
-        </div>
+        <BlocoLinha key={`${b.exerciseId}-${i}`} b={b} />
       ))}
     </div>
   )
@@ -136,8 +153,10 @@ export default function Training() {
       {workout ? (
         <Section
           title={workout.name}
-          hint={`${workout.focus} - ${workout.estimatedMinutes} min`}
-          action={log?.done ? <Tag tone="accent">feito</Tag> : undefined}
+          hint={`${workout.focus} - reserve ~${workout.estimatedMinutes} min`}
+          action={
+            workout.modality ? <Tag>{modalityLabel(workout.modality)}</Tag> : undefined
+          }
         >
           <Card>
             <ExerciseList workout={workout} />
