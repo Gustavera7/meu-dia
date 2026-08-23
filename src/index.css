@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #0B0F14;
+  --color-surface: #131A22;
+  --color-surface-2: #1B2531;
+  --color-line: #24313F;
+  --color-fg: #E9EFF5;
+  --color-muted: #8B9AA9;
+  --color-faint: #5D6B7A;
+  --color-accent: #4ADE80;
+  --color-accent-soft: #143024;
+  --color-warn: #FBBF24;
+  --color-cool: #60A5FA;
+  --color-violet: #A78BFA;
+
+  /* Fonte do proprio sistema: no iPhone e a San Francisco, sem download,
+     sem flash de texto e com o mesmo rendering dos apps nativos. */
+  --font-sans: -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", Roboto, sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--color-ink);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv02", "cv03", "cv04";
+    overscroll-behavior-y: none;
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+  }
+
+  input,
+  textarea,
+  select {
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Evita o zoom automatico do iOS ao focar campos */
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
+
+@utility safe-bottom {
+  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 0.5rem);
+}
+
+@utility safe-top {
+  padding-top: calc(env(safe-area-inset-top, 0px) + 0.5rem);
+}
+
+/* Barra de rolagem discreta nas listas horizontais */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.animate-rise {
+  animation: rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
