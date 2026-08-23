@@ -13,6 +13,21 @@ import { TABELA } from '../supabaseConfig'
  * `merge.ts`, registro a registro.
  */
 
+/**
+ * Traduz o erro do banco para algo que diga o que fazer.
+ * O caso mais comum na primeira instalacao e a tabela nao existir ainda.
+ */
+function explica(mensagem: string): string {
+  const m = mensagem.toLowerCase()
+  if (m.includes('schema cache') || m.includes('does not exist')) {
+    return 'A tabela de dados ainda nao foi criada no Supabase. Rode o arquivo supabase-schema.sql no SQL Editor do painel.'
+  }
+  if (m.includes('jwt') || m.includes('expired')) {
+    return 'Sua sessao expirou. Entre de novo.'
+  }
+  return mensagem
+}
+
 let contaId: string | null = null
 
 export function setContaSincronizada(id: string | null): void {
@@ -42,7 +57,7 @@ export const supabaseAdapter: StorageAdapter = {
       .eq('user_id', contaId)
       .maybeSingle()
 
-    if (error) throw new SyncError('falha', error.message)
+    if (error) throw new SyncError('falha', explica(error.message))
     if (!data?.data) return null
 
     const estado = data.data as AppState
@@ -64,7 +79,7 @@ export const supabaseAdapter: StorageAdapter = {
       if (m.includes('row-level security') || m.includes('permission')) {
         throw new SyncError('sem_permissao', error.message)
       }
-      throw new SyncError('falha', error.message)
+      throw new SyncError('falha', explica(error.message))
     }
   },
 }

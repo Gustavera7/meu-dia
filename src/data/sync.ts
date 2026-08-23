@@ -143,11 +143,14 @@ export async function pull(local: AppState): Promise<AppState> {
       message: remoto ? 'Dados juntados' : 'Primeira sincronizacao',
       lastSyncedAt: resultado.sync.lastSyncedAt,
     })
-  } catch {
+  } catch (err) {
     leituraConfirmada = false
+    const detalhe = err instanceof SyncError ? err.message : ''
     anunciar({
       status: 'erro',
-      message: 'Nao consegui ler a nuvem. Nada sera enviado ate conseguir, para nao apagar o outro aparelho.',
+      message:
+        detalhe ||
+        'Nao consegui ler a nuvem. Nada sera enviado ate conseguir, para nao apagar o outro aparelho.',
     })
   }
 
