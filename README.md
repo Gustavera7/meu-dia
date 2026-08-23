@@ -7,18 +7,52 @@ O ciclo do produto e um so:
 
 **Planejar → Executar → Registrar → Aprender → Ajustar o proximo dia.**
 
-## Como rodar
+## No ar
+
+**https://gustavera7.github.io/meu-dia/**
+
+Abra no navegador, entre com e-mail e senha e escolha "Adicionar a tela de
+inicio". A partir dai o app abre em tela cheia, como um aplicativo, e funciona
+sem conexao.
+
+## Como rodar localmente
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abra `http://localhost:5173`. Para usar no celular na mesma rede, o comando ja
-sobe com `--host`: use o endereco de rede que o terminal mostra.
+Abra `http://localhost:5173`. O comando ja sobe com `--host`, entao da para
+abrir pelo celular na mesma rede usando o endereco que o terminal mostra.
 
-Para instalar no celular: abra o endereco no navegador e escolha
-"Adicionar a tela de inicio".
+## Como publicar uma nova versao
+
+```bash
+npm run build:pages
+```
+
+Isso gera a pasta `docs/`, que e o que o GitHub Pages serve. Depois:
+
+```bash
+git add -A && git commit -m "descricao da mudanca" && git push
+```
+
+O site atualiza em cerca de um minuto. Manter `docs/` versionado deixa codigo
+e versao publicada no mesmo commit: da para saber exatamente o que esta no ar.
+
+## Primeira configuracao do Supabase
+
+O app usa contas do Supabase. Uma vez por projeto:
+
+1. Painel do Supabase, **SQL Editor**, cole o conteudo de
+   `supabase-schema.sql` e rode. Isso cria a tabela `meudia_state` com Row
+   Level Security ligada.
+2. Para criar contas de teste sem esperar e-mail de confirmacao:
+   **Authentication, Providers, Email**, desligue *Confirm email*.
+
+Para apontar para outro projeto, troque `SUPABASE_URL` e `SUPABASE_ANON_KEY`
+em `src/data/supabaseConfig.ts`. A chave anonima nasce para ficar no
+navegador: quem protege os dados e a Row Level Security, nao o segredo dela.
 
 ## O que existe hoje
 
@@ -125,8 +159,13 @@ Onde os dados moram depende de onde o app foi aberto:
 
 | Contexto | Destino | Sincroniza |
 | --- | --- | --- |
-| `npm run dev` ou hospedagem propria | `localStorage` | Nao |
+| Com conta conectada | Sua linha no Supabase | Sim |
+| Sem conta | `localStorage`, separado por conta | Nao |
 | Artifact publicado na sua conta | `data/estado.json` do proprio artifact | Sim |
+
+Cada conta tem o proprio espaco no armazenamento local. Sem isso, entrar como
+uma pessoa, sair e entrar como outra faria a segunda carregar os dados da
+primeira e envia-los para a conta dela.
 
 No artifact, o app fica fixo em `index.html` e os dados vao para um arquivo
 separado. Gravar publica uma versao so desse arquivo, entao a aba que grava
