@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { criarConta, entrar, recuperarSenha } from '@/data/auth'
 import { Button, Field, Input, Note, cx } from '@/ui/components/primitives'
+import { Prumo } from '@/ui/components/Prumo'
 
 type Modo = 'entrar' | 'criar' | 'recuperar'
 
@@ -63,20 +64,12 @@ export default function Auth({ onSkip }: { onSkip: () => void }) {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-sm flex-col justify-center px-6 py-10">
       <div className="mb-8 text-center">
-        <div className="mx-auto mb-5 grid size-16 place-items-center rounded-2xl bg-surface">
-          <svg viewBox="0 0 48 48" className="size-9" fill="none">
-            <circle cx="24" cy="24" r="15" stroke="var(--color-surface-2)" strokeWidth="4" />
-            <circle
-              cx="24" cy="24" r="15" stroke="var(--color-accent)" strokeWidth="4"
-              strokeLinecap="round" strokeDasharray="94" strokeDashoffset="30"
-              transform="rotate(-90 24 24)"
-            />
-            <circle cx="24" cy="24" r="4.5" fill="var(--color-accent)" />
-          </svg>
+        <div className="mx-auto mb-5 grid size-20 place-items-center rounded-2xl bg-surface">
+          <Prumo size={52} swing />
         </div>
-        <h1 className="text-[26px] font-semibold tracking-tight">Meu Dia</h1>
-        <p className="mt-1 text-[13px] text-muted">
-          Seu sistema de saude, performance e desenvolvimento
+        <h1 className="text-[26px] font-semibold tracking-[0.16em]">PRUMO</h1>
+        <p className="mx-auto mt-2 max-w-[30ch] text-[13px] leading-snug text-muted">
+          Saude, performance e desenvolvimento. Um dia de cada vez, no seu prumo.
         </p>
       </div>
 

@@ -4,9 +4,14 @@ import { useApp } from '@/state/useApp'
 import { Screen } from '@/ui/components/Layout'
 import { Card, Note, ProgressBar, Section, Tag } from '@/ui/components/primitives'
 
+/**
+ * Leitura de consistencia, nunca de saude.
+ * As faixas baixas ficam descritivas de proposito: dizer que um pilar esta
+ * "torto" seria julgamento, e o app nao existe para cobrar.
+ */
 function level(ratio: number): string {
-  if (ratio >= 0.8) return 'bem presente'
-  if (ratio >= 0.5) return 'presente'
+  if (ratio >= 0.8) return 'no prumo'
+  if (ratio >= 0.5) return 'firmando'
   if (ratio > 0) return 'aparecendo pouco'
   return 'sem registro'
 }

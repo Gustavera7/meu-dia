@@ -1,4 +1,13 @@
-# Meu Dia — sistema pessoal de saude, performance e desenvolvimento
+# Prumo
+
+**Prumo** e o fio com um peso na ponta que a gravidade deixa reto. Nao importa
+o quanto a parede esteja torta: ele sempre encontra a vertical.
+
+E o que este app faz com a sua rotina. Voce dormiu mal, comeu fora do plano,
+pulou dois treinos. Ele nao cobra: devolve voce ao prumo, ajustando o dia
+seguinte ao que voce realmente tem para dar.
+
+Sistema pessoal de saude, performance e desenvolvimento
 
 MVP pessoal. Roda no navegador do celular e pode ser instalado na tela inicial
 como aplicativo. Todos os dados ficam no proprio aparelho, sem servidor.
@@ -9,7 +18,7 @@ O ciclo do produto e um so:
 
 ## No ar
 
-**https://gustavera7.github.io/meu-dia/**
+**https://gustavera7.github.io/prumo/**
 
 Abra no navegador, entre com e-mail e senha e escolha "Adicionar a tela de
 inicio". A partir dai o app abre em tela cheia, como um aplicativo, e funciona

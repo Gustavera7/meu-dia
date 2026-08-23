@@ -1,12 +1,12 @@
 /**
- * Service worker do Meu Dia.
+ * Service worker do Prumo.
  *
  * Objetivo: o app abrir sem conexao. A estrategia muda conforme o arquivo:
  * - assets com hash no nome nunca mudam de conteudo, entao vale cache primeiro;
  * - a pagina em si e buscada na rede primeiro, para uma versao nova chegar
  *   sozinha, com o cache servindo de rede de seguranca quando estiver offline.
  */
-const CACHE = 'meu-dia-v1'
+const CACHE = 'prumo-v1'
 const ESSENCIAIS = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png']
 
 self.addEventListener('install', (evento) => {

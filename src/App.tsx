@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useApp } from '@/state/useApp'
 import { TabBar } from '@/ui/components/Layout'
+import { PrumoSplash } from '@/ui/components/Prumo'
 import Onboarding from '@/ui/screens/Onboarding'
 import Auth from '@/ui/screens/Auth'
 import { authDisponivel } from '@/data/auth'
@@ -42,11 +43,7 @@ export default function App() {
   }, [conta])
 
   // Esperar a sessao evita mostrar login para quem ja esta conectado.
-  if (!authPronto) {
-    return (
-      <div className="grid min-h-dvh place-items-center text-sm text-faint">Abrindo</div>
-    )
-  }
+  if (!authPronto) return <PrumoSplash />
 
   if (authDisponivel() && !conta && !semConta) {
     return (

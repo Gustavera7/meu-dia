@@ -1,6 +1,6 @@
 {
-  "name": "Meu Dia — Sistema Pessoal",
-  "short_name": "Meu Dia",
+  "name": "Prumo — saude, performance e desenvolvimento",
+  "short_name": "Prumo",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
@@ -26,5 +26,6 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "description": "Planejar, executar, registrar, aprender e ajustar o proximo dia."
 }

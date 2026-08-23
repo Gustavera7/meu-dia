@@ -1,8 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Prumo">
   <rect width="512" height="512" rx="112" fill="#0B0F14"/>
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#1E2A38" stroke-width="34"/>
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#4ADE80" stroke-width="34"
-    stroke-linecap="round" stroke-dasharray="707" stroke-dashoffset="205"
-    transform="rotate(-90 256 256)"/>
-  <circle cx="256" cy="256" r="42" fill="#4ADE80"/>
+  <path d="M160 72 H352" stroke="#22303F" stroke-width="26" stroke-linecap="round"/>
+  <path d="M256 72 V256" stroke="#4ADE80" stroke-width="22" stroke-linecap="round"/>
+  <path d="M256 256 L314 332 L256 440 L198 332 Z" fill="#4ADE80"/>
 </svg>

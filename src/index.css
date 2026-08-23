@@ -84,3 +84,45 @@
 .animate-rise {
   animation: rise 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+/**
+ * Pendulo amortecido: o peso passa da vertical, volta com menos forca a
+ * cada ida e para no lugar. Os tempos sao irregulares de proposito, porque
+ * um vaivem de intervalos iguais parece maquina, nao gravidade.
+ */
+@keyframes prumo-assenta {
+  0% {
+    transform: rotate(-16deg);
+  }
+  22% {
+    transform: rotate(10deg);
+  }
+  42% {
+    transform: rotate(-6deg);
+  }
+  60% {
+    transform: rotate(3.5deg);
+  }
+  76% {
+    transform: rotate(-1.8deg);
+  }
+  89% {
+    transform: rotate(0.8deg);
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+.prumo-assenta {
+  animation: prumo-assenta 1.9s cubic-bezier(0.37, 0, 0.63, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prumo-assenta {
+    animation: none;
+  }
+  .animate-rise {
+    animation: none;
+  }
+}

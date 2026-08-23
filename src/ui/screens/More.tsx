@@ -4,6 +4,7 @@ import { useApp } from '@/state/useApp'
 import { openGoals } from '@/state/selectors'
 import { Screen } from '@/ui/components/Layout'
 import { Card, Section, Tag, cx } from '@/ui/components/primitives'
+import { Prumo } from '@/ui/components/Prumo'
 
 interface Destino {
   to: string
@@ -85,7 +86,11 @@ export default function More() {
         </Card>
       </Section>
 
-      <p className={cx('pb-4 text-center text-[11px] text-faint')}>{sync.message}</p>
+      <footer className="flex flex-col items-center gap-2 pb-6 pt-2">
+        <Prumo size={26} />
+        <span className="text-[10px] font-semibold tracking-[0.24em] text-faint">PRUMO</span>
+        <span className={cx('text-center text-[11px] text-faint')}>{sync.message}</span>
+      </footer>
     </Screen>
   )
 }

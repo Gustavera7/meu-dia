@@ -22,8 +22,8 @@ const icon192 = `data:image/png;base64,${b64('icon-192.png')}`
 const icon512 = `data:image/png;base64,${b64('icon-512.png')}`
 
 const manifest = {
-  name: 'Meu Dia',
-  short_name: 'Meu Dia',
+  name: 'Prumo',
+  short_name: 'Prumo',
   display: 'standalone',
   orientation: 'portrait',
   background_color: '#0B0F14',
@@ -47,12 +47,12 @@ const bootstrap = `
     for (var k in attrs) el.setAttribute(k, attrs[k]);
     head.appendChild(el);
   };
-  document.title = 'Meu Dia';
+  document.title = 'Prumo';
   add('meta', { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no' });
   add('meta', { name: 'apple-mobile-web-app-capable', content: 'yes' });
   add('meta', { name: 'mobile-web-app-capable', content: 'yes' });
   add('meta', { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' });
-  add('meta', { name: 'apple-mobile-web-app-title', content: 'Meu Dia' });
+  add('meta', { name: 'apple-mobile-web-app-title', content: 'Prumo' });
   add('meta', { name: 'theme-color', content: '#0B0F14' });
   add('meta', { name: 'color-scheme', content: 'dark' });
   add('link', { rel: 'apple-touch-icon', href: ${JSON.stringify(icon192)} });
@@ -64,7 +64,7 @@ const bootstrap = `
 // "</script" dentro de uma string do bundle fecharia a tag antes da hora
 const safe = (code) => code.replace(/<\/script/gi, '<\/script')
 
-const html = `<title>Meu Dia</title>
+const html = `<title>Prumo</title>
 <style>
 ${css}
 /* O host pinta o proprio fundo atras da pagina: sem isto, o app herda o tema
@@ -77,5 +77,5 @@ html, body { background: #0B0F14; color: #E9EFF5; min-height: 100%; }
 <script type="module">${safe(js)}</script>
 `
 
-writeFileSync(join(DIST, 'meu-dia.html'), html)
-console.log(`dist/meu-dia.html gerado (${(html.length / 1024).toFixed(0)} kB)`)
+writeFileSync(join(DIST, 'prumo.html'), html)
+console.log(`dist/prumo.html gerado (${(html.length / 1024).toFixed(0)} kB)`)
