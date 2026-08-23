@@ -1,20 +1,24 @@
 /**
- * Conexao com o Supabase.
+ * Conexao com o Supabase deste app.
  *
- * A chave abaixo e a chave ANONIMA do projeto: ela nasce para ficar no
- * navegador e nao da acesso a nada sozinha. Quem protege os dados e a
- * Row Level Security no banco, definida em `supabase-schema.sql`: cada
- * conta so enxerga a propria linha.
+ * O Meu Dia tem projeto PROPRIO, separado de qualquer outro app. Enquanto
+ * estes dois valores estiverem vazios, o app funciona normalmente guardando
+ * tudo no aparelho: apenas login e sincronizacao ficam indisponiveis.
  *
- * Para usar um projeto proprio, troque estes dois valores por
- * Project URL e anon key (Supabase, Settings, API) e rode o SQL do
- * arquivo `supabase-schema.sql` no editor do painel.
+ * Para ligar:
+ *   1. Crie um projeto no Supabase.
+ *   2. Rode o conteudo de `supabase-schema.sql` no SQL Editor do projeto.
+ *   3. Cole abaixo a Project URL e a chave ANONIMA (anon / publishable).
+ *
+ * A chave anonima nasce para ficar no navegador e nao da acesso a nada
+ * sozinha: quem protege os dados e a Row Level Security do banco.
+ * NUNCA coloque aqui a chave `service_role` — essa ignora a RLS e daria
+ * acesso a tudo para qualquer pessoa que abrisse o site.
  */
-export const SUPABASE_URL = 'https://yeilsajnttrmkxnewpun.supabase.co'
-export const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InllaWxzYWpudHRybWt4bmV3cHVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODY4Mjk5MDAsImV4cCI6MjEwMjQwNTkwMH0.dqFnTtaiwKKuEPbFK4xfguM9rJFYqW4cEwMCn_x7UqY'
+export const SUPABASE_URL = ''
+export const SUPABASE_ANON_KEY = ''
 
-/** Tabela propria deste app, separada do controle financeiro. */
+/** Tabela deste app dentro do projeto. */
 export const TABELA = 'meudia_state'
 
 export const supabaseConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY)

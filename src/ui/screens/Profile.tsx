@@ -10,6 +10,7 @@ import { ALL_MODULES } from '@/data/defaults'
 import { exportJSON, importJSON } from '@/data/storage'
 import { useApp } from '@/state/useApp'
 import { activePrescription } from '@/state/selectors'
+import { authDisponivel } from '@/data/auth'
 import { Screen } from '@/ui/components/Layout'
 import {
   Button, Card, Chip, Field, Input, Note, Section, Sheet, Stepper, Tag, TextArea, cx,
@@ -276,7 +277,7 @@ export default function Profile() {
                 desta conta continuam guardados na nuvem.
               </p>
             </>
-          ) : (
+          ) : authDisponivel() ? (
             <>
               <p className="text-[15px] font-medium">Usando sem conta</p>
               <p className="mt-0.5 text-[12px] leading-snug text-muted">
@@ -294,6 +295,15 @@ export default function Profile() {
                   Entrar ou criar conta
                 </Button>
               </div>
+            </>
+          ) : (
+            <>
+              <p className="text-[15px] font-medium">Contas ainda nao ligadas</p>
+              <p className="mt-0.5 text-[12px] leading-snug text-muted">
+                Tudo funciona normalmente, guardado neste aparelho. Para abrir o
+                mesmo perfil no celular e no computador, falta configurar o
+                servidor deste app.
+              </p>
             </>
           )}
         </Card>
